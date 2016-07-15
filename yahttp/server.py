@@ -1,4 +1,4 @@
-import argparse
+import argparse, os
 
 from tornado import ioloop, web
 
@@ -34,6 +34,12 @@ class MainHandler(web.StaticFileHandler):
 
     def write_error(self, status_code, **kwargs):
         super().write_error(status_code, **kwargs)
+        
+    def validate_absolute_path(self, root, absolute_path):
+        absolute_path = super().validate_absolute_path(root, absolute_path)
+        if not os.access(absolute_path, os.R_OK):
+            raise web.HTTPError(404)
+        return absolute_path
 
 
 def run(args):
